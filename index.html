@@ -1,1 +1,91 @@
-Coming Soon
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>m5n.github.io</title>
+    <style>
+body { display: table; }
+p { padding: 0.25em; display: table-cell; vertical-align: bottom; white-space: pre; }
+html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+body { background: black; color: #aaa; font-family: Fixed, monospace; line-height: 1.25 }
+input { background: inherit; color: inherit; font: inherit; border: 0; outline: none; cursor: default; }
+span { display: inline-block; width: 0.55em; height: 1em; background: #aaa; position: relative; top: 0.2em; }
+div { display: none; }
+    </style>
+  </head>
+  <body>
+    <p>Connecting... <span></span></p>
+    <div>
+
+................................................................................
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ |    |    |       |       |    |         |      |   |         |  |    |     | 
+      |  ._______          |        .__  __  .__     |   ___.     |  .__     |  
+  _____  |  ____/ ____     |   ____ |__|/  |_|  |__  __ _\_ |__   |  |__| ____  
+ /     \ |___  \ /    \       / ___\|  \   __\  |  \|  |  \ __ \     |  |/  _ \ 
+|  Y Y  \/      \   |  \     / /_/  |  ||  | |   Y  \  |  / \_\ \    |  (  /_/ )
+|__|_|  /_____  /___|  / /\  \___  /|__||__| |___|  /____/|___  / /\ |__|\____/ 
+      \/      \/     \/  \/ /_____/               \/          \/  \/            
+          |                            |    |          |               |
+   |      |   |      |   |  |      |   |    |    |     |    |          |   |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+................................................................................
+
+Welcome to m5n.github.io, home of Maarten van Egmond's open source goodness!
+
+................................................................................
+
+login: </div>
+    <script>
+/*global document */
+(function () {
+  'use strict';
+
+  function printChar() {
+    //TODO: enable once blinking works? clearInterval(interval);
+
+    if (index == text.length) {
+      setInterval(blink, 500);
+      return;
+    }
+
+    var i = pNode.innerHTML.indexOf('<span></span>'),
+        prefix = pNode.innerHTML.substring(0, i);
+
+    pNode.innerHTML = prefix + text.charAt(index) + '<span></span>';
+
+    if (text.charAt(index) == '\n') {
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    index += 1;
+    setTimeout(printChar, 0);
+  }
+
+  function blink() {
+    var spanNode = document.getElementsByTagName('span')[0];
+    spanNode.style.visibility = spanNode.style.visibility == 'hidden' ? 'visible' : 'hidden';
+  }
+
+  var bodyNode = document.getElementsByTagName('body')[0];
+  var pNode = document.getElementsByTagName('p')[0];
+  var spanNode = document.getElementsByTagName('span')[0];
+  var textNode = document.getElementsByTagName('div')[0];
+  var inputNode = document.getElementsByTagName('input')[0];
+  var scriptNode = document.getElementsByTagName('script')[0];
+
+  scriptNode.parentNode.removeChild(scriptNode);
+  textNode.parentNode.removeChild(textNode);
+
+  var index = 0;
+  var text = textNode.innerHTML;
+
+  setTimeout(printChar, 2000);
+  // TODO: removes "Connecting" msg if enabled? var interval = setInterval(blink, 500);
+
+// TODO: character input for login & pwd.
+}());
+    </script>
+  </body>
+</html>
+
