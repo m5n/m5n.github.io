@@ -27,7 +27,7 @@ div { display: none; }
 |__|_|  /_____  /___|  / /\  \___  /|__||__| |___|  /____/|___  / /\ |__|\____/ 
       \/      \/     \/  \/ /_____/               \/          \/  \/            
           |                            |    |          |               |
-   |      |   |      |   |  |      |   |    |    |     |    |          |   |
+   |      |   |        |      |        |    |    |     |    |          |   |
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ................................................................................
 
@@ -42,14 +42,16 @@ login: </div>
   'use strict';
 
   function printChar() {
-    //TODO: enable once blinking works? clearInterval(interval);
+    clearInterval(timerId);
+    spanNode = document.getElementsByTagName('span')[0];
+    spanNode.style.visibility = 'visible';
 
     if (index == text.length) {
-      setInterval(blink, 500);
+      timerId = setInterval(blink, 500);
       return;
     }
 
-    var i = pNode.innerHTML.indexOf('<span></span>'),
+    var i = pNode.innerHTML.indexOf('<span'),   // Could be <span style=...>
         prefix = pNode.innerHTML.substring(0, i);
 
     pNode.innerHTML = prefix + text.charAt(index) + '<span></span>';
@@ -63,15 +65,14 @@ login: </div>
   }
 
   function blink() {
-    var spanNode = document.getElementsByTagName('span')[0];
+    // Span gets rewritten every time, so cannot cache it.
+    spanNode = document.getElementsByTagName('span')[0];
     spanNode.style.visibility = spanNode.style.visibility == 'hidden' ? 'visible' : 'hidden';
   }
 
-  var bodyNode = document.getElementsByTagName('body')[0];
   var pNode = document.getElementsByTagName('p')[0];
   var spanNode = document.getElementsByTagName('span')[0];
   var textNode = document.getElementsByTagName('div')[0];
-  var inputNode = document.getElementsByTagName('input')[0];
   var scriptNode = document.getElementsByTagName('script')[0];
 
   scriptNode.parentNode.removeChild(scriptNode);
@@ -80,8 +81,8 @@ login: </div>
   var index = 0;
   var text = textNode.innerHTML;
 
-  setTimeout(printChar, 2000);
-  // TODO: removes "Connecting" msg if enabled? var interval = setInterval(blink, 500);
+  var timerId = setInterval(blink, 500);
+  setTimeout(printChar, 2500);
 
 // TODO: character input for login & pwd.
 }());
