@@ -37,54 +37,54 @@ Welcome to m5n.github.io, home of Maarten van Egmond's open source goodness!
 
 login: </div>
     <script>
-/*global document */
+/*global clearInterval, document, setInterval, setTimeout, window */
 (function () {
-  'use strict';
+    'use strict';
 
-  function printChar() {
-    clearInterval(timerId);
-    spanNode = document.getElementsByTagName('span')[0];
-    spanNode.style.visibility = 'visible';
+    var pNode = document.getElementsByTagName('p')[0],
+        spanNode = document.getElementsByTagName('span')[0],
+        textNode = document.getElementsByTagName('div')[0],
+        scriptNode = document.getElementsByTagName('script')[0],
+        timerId,
+        index = 0,
+        text = textNode.innerHTML;
 
-    if (index == text.length) {
-      timerId = setInterval(blink, 500);
-      return;
+    function blink() {
+        // Span gets rewritten every time, so cannot cache it.
+        spanNode = document.getElementsByTagName('span')[0];
+        spanNode.style.visibility = spanNode.style.visibility === 'hidden' ? 'visible' : 'hidden';
     }
 
-    var i = pNode.innerHTML.indexOf('<span'),   // Could be <span style=...>
-        prefix = pNode.innerHTML.substring(0, i);
+    function printChar() {
+        clearInterval(timerId);
+        spanNode = document.getElementsByTagName('span')[0];
+        spanNode.style.visibility = 'visible';
 
-    pNode.innerHTML = prefix + text.charAt(index) + '<span></span>';
+        if (index === text.length) {
+            timerId = setInterval(blink, 500);
+            return;
+        }
 
-    if (text.charAt(index) == '\n') {
-      window.scrollTo(0, document.body.scrollHeight);
+        var i = pNode.innerHTML.indexOf('<span'), // Could be <span style=...>
+            prefix = pNode.innerHTML.substring(0, i);
+
+        pNode.innerHTML = prefix + text.charAt(index) + '<span></span>';
+
+        if (text.charAt(index) === '\n') {
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        index += 1;
+        setTimeout(printChar, 0);
     }
 
-    index += 1;
-    setTimeout(printChar, 0);
-  }
+    scriptNode.parentNode.removeChild(scriptNode);
+    textNode.parentNode.removeChild(textNode);
 
-  function blink() {
-    // Span gets rewritten every time, so cannot cache it.
-    spanNode = document.getElementsByTagName('span')[0];
-    spanNode.style.visibility = spanNode.style.visibility == 'hidden' ? 'visible' : 'hidden';
-  }
+    timerId = setInterval(blink, 500);
+    setTimeout(printChar, 4000);
 
-  var pNode = document.getElementsByTagName('p')[0];
-  var spanNode = document.getElementsByTagName('span')[0];
-  var textNode = document.getElementsByTagName('div')[0];
-  var scriptNode = document.getElementsByTagName('script')[0];
-
-  scriptNode.parentNode.removeChild(scriptNode);
-  textNode.parentNode.removeChild(textNode);
-
-  var index = 0;
-  var text = textNode.innerHTML;
-
-  var timerId = setInterval(blink, 500);
-  setTimeout(printChar, 2500);
-
-// TODO: character input for login & pwd.
+    // TODO: character input for login & pwd.
 }());
     </script>
   </body>
