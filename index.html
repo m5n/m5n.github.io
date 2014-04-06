@@ -1,21 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>m5n.github.io</title>
-    <style>
-body { display: table; }
-p { padding: 0.25em; display: table-cell; vertical-align: bottom; white-space: pre; }
-html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
-body { background: black; color: #aaa; font-family: Fixed, monospace; line-height: 1.25 }
-input { background: inherit; color: inherit; font: inherit; border: 0; outline: none; cursor: default; }
-span { display: inline-block; width: 0.55em; height: 1em; background: #aaa; position: relative; top: 0.2em; }
-div { display: none; }
-    </style>
-  </head>
-  <body>
-    <p>Connecting... <span></span></p>
-    <div>
+    <head>
+        <meta charset="utf-8">
+        <title>m5n.github.io</title>
+        <style>
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+body {
+    background: black;
+    color: #aaa;
+    display: table;
+    font-family: Fixed, monospace;
+    line-height: 1.25
+}
+
+div {
+    display: none;
+}
+
+p {
+    display: table-cell;
+    padding: 0.25em;
+    vertical-align: bottom;
+    white-space: pre;
+}
+
+span {
+    background: #aaa;
+    display: inline-block;
+    height: 1em;
+    position: relative;
+    top: 0.2em;
+    width: 0.55em;
+}
+        </style>
+    </head>
+    <body>
+        <p>Connecting...<span></span></p>
+        <div>
+Connected to github.map.fastly.net (199.27.79.133)
 
 ................................................................................
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -30,23 +59,24 @@ div { display: none; }
    |      |   |        |      |        |    |    |     |    |          |   |
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ................................................................................
-
-Welcome to m5n.github.io, home of Maarten van Egmond's open source goodness!
-
+.                                                                              .
+. Welcome to m5n.github.io, home of Maarten van Egmond's open source goodness! .
+.                                                                              .
 ................................................................................
 
-login: </div>
-    <script>
+username: </div>
+        <script>
 /*global clearInterval, document, setInterval, setTimeout, window */
 (function () {
     'use strict';
 
     var pNode = document.getElementsByTagName('p')[0],
-        spanNode = document.getElementsByTagName('span')[0],
         textNode = document.getElementsByTagName('div')[0],
+        spanNode = document.getElementsByTagName('span')[0],
         scriptNode = document.getElementsByTagName('script')[0],
         timerId,
         index = 0,
+        callbackFn,
         text = textNode.innerHTML;
 
     function blink() {
@@ -55,6 +85,18 @@ login: </div>
         spanNode.style.visibility = spanNode.style.visibility === 'hidden' ? 'visible' : 'hidden';
     }
 
+    function echo(char) {
+        var i = pNode.innerHTML.indexOf('<span'), // Could be <span style=...>
+            prefix = pNode.innerHTML.substring(0, i);
+
+        pNode.innerHTML = prefix + char + '<span></span>';
+
+        if (char === '\n') {
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    }
+
+
     function printChar() {
         clearInterval(timerId);
         spanNode = document.getElementsByTagName('span')[0];
@@ -62,31 +104,75 @@ login: </div>
 
         if (index === text.length) {
             timerId = setInterval(blink, 500);
+
+            callbackFn();
+
             return;
         }
 
-        var i = pNode.innerHTML.indexOf('<span'), // Could be <span style=...>
-            prefix = pNode.innerHTML.substring(0, i);
-
-        pNode.innerHTML = prefix + text.charAt(index) + '<span></span>';
-
-        if (text.charAt(index) === '\n') {
-            window.scrollTo(0, document.body.scrollHeight);
-        }
+        echo(text.charAt(index));
 
         index += 1;
         setTimeout(printChar, 0);
     }
 
+    function acceptInput() {
+// TODO: create readInput(prompt, hidden) function
+        var passwordInput = false;
+
+        document.onkeydown = function (e) {
+            e = e || window.event;
+            var code = e.keyCode || e.which;
+            if (code === 8) {   // Backspace
+                // TODO: remove character, but only up to the prompt!
+                return false;
+            }
+        };
+        document.onkeypress = function (e) {
+            e = e || window.event;
+
+            e.cancelBubble = true;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+
+            var code = e.keyCode || e.which;
+            switch (code) {
+            case 13:   // Enter
+                if (passwordInput) {
+                    text = '\nusername: ';
+                } else {
+                    text = '\npassword: ';
+                }
+                index = 0;
+
+                callbackFn = function () {
+                    passwordInput = !passwordInput;
+                };
+                printChar();
+
+                break;
+            default:
+                echo(passwordInput ? '*' : String.fromCharCode(code));
+            }
+        };
+
+        // TODO: Avoid the user needing to click anywhere first.
+        pNode.focus();   // Doesn't work, perhaps need to do this after contents has been rendered?
+    }
+
     scriptNode.parentNode.removeChild(scriptNode);
     textNode.parentNode.removeChild(textNode);
 
+    callbackFn = acceptInput;
     timerId = setInterval(blink, 500);
     setTimeout(printChar, 4000);
-
-    // TODO: character input for login & pwd.
+    // TODO: "Connecting..." msg should also be delayed-printed.
 }());
-    </script>
-  </body>
+        </script>
+    </body>
 </html>
 
