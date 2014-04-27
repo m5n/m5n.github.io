@@ -64,7 +64,7 @@ Connected to github.map.fastly.net (199.27.79.133)
 .                                                                              .
 ................................................................................
 
-username: </div>
+Username: </div>
         <script>
 /*global clearInterval, document, setInterval, setTimeout, window */
 (function () {
@@ -116,6 +116,16 @@ username: </div>
         setTimeout(printChar, 0);
     }
 
+    function swallowEvent(e) {
+        e.cancelBubble = true;
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+    }
+
     function acceptInput() {
 // TODO: create readInput(prompt, hidden) function
         var passwordInput = false;
@@ -124,28 +134,29 @@ username: </div>
             e = e || window.event;
             var code = e.keyCode || e.which;
             if (code === 8) {   // Backspace
-                // TODO: remove character, but only up to the prompt!
-                return false;
+                // Get last printed line.
+                /\n(.+?)<span/.test(pNode.innerHTML);
+                if (RegExp.$1.length > "Username: ".length) {
+                    // Remove last char.
+                    pNode.innerHTML = pNode.innerHTML.replace(/\n(.+?)<span/, '\n' + RegExp.$1.substring(0, RegExp.$1.length - 1) + '<span');
+                }
+                // Swallow to prevent browser doing history.back().
+                swallowEvent(e);
             }
         };
         document.onkeypress = function (e) {
             e = e || window.event;
 
-            e.cancelBubble = true;
-            if (e.stopPropagation) {
-                e.stopPropagation();
-            }
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
+            // Prevent browser default behavior.
+            swallowEvent(e);
 
             var code = e.keyCode || e.which;
             switch (code) {
             case 13:   // Enter
                 if (passwordInput) {
-                    text = '\nusername: ';
+                    text = '\nUsername: ';
                 } else {
-                    text = '\npassword: ';
+                    text = '\nPassword: ';
                 }
                 index = 0;
 
