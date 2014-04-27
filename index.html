@@ -70,9 +70,9 @@ Username: </div>
 (function () {
     'use strict';
 
-    var pNode = document.getElementsByTagName('p')[0],
-        textNode = document.getElementsByTagName('div')[0],
-        spanNode = document.getElementsByTagName('span')[0],
+    var outputNode = document.getElementsByTagName('p')[0],
+        welcomeMsgNode = document.getElementsByTagName('div')[0],
+        blinkNode = document.getElementsByTagName('span')[0],
         scriptNode = document.getElementsByTagName('script')[0],
         timerId,
         index,
@@ -81,15 +81,16 @@ Username: </div>
 
     function blink() {
         // Span gets rewritten every time, so cannot cache it.
-        spanNode = document.getElementsByTagName('span')[0];
-        spanNode.style.visibility = spanNode.style.visibility === 'hidden' ? 'visible' : 'hidden';
+        blinkNode = document.getElementsByTagName('span')[0];
+        blinkNode.style.visibility =
+            blinkNode.style.visibility === 'hidden' ? 'visible' : 'hidden';
     }
 
     function echo(char) {
-        var i = pNode.innerHTML.indexOf('<span'), // Could be <span style=...>
-            prefix = pNode.innerHTML.substring(0, i);
+        var i = outputNode.innerHTML.indexOf('<span'), // Could have style attr.
+            prefix = outputNode.innerHTML.substring(0, i);
 
-        pNode.innerHTML = prefix + char + '<span></span>';
+        outputNode.innerHTML = prefix + char + '<span></span>';
 
         if (char === '\n') {
             window.scrollTo(0, document.body.scrollHeight);
@@ -98,8 +99,8 @@ Username: </div>
 
     function printChar() {
         clearInterval(timerId);
-        spanNode = document.getElementsByTagName('span')[0];
-        spanNode.style.visibility = 'visible';
+        blinkNode = document.getElementsByTagName('span')[0];
+        blinkNode.style.visibility = 'visible';
 
         if (index === text.length) {
             timerId = setInterval(blink, 500);
@@ -115,7 +116,7 @@ Username: </div>
         setTimeout(printChar, 0);
     }
 
-    function prepPrintChar(txt, cbFn) {
+    function printString(txt, cbFn) {
         text = txt;
         index = 0;
         callbackFn = cbFn;
@@ -133,7 +134,7 @@ Username: </div>
     }
 
     function processCtrlC() {
-        prepPrintChar(
+        printString(
             '\nConnection terminated.',
             function () {
                 // Stop blinking.
@@ -164,18 +165,22 @@ Username: </div>
         };
     }
 
+    // TODO: create readInput(prompt, hidden) function
     function acceptInput() {
-// TODO: create readInput(prompt, hidden) function
         var passwordInput = false;
 
         document.onkeydown = function (e) {
             e = e || window.event;
             var code = e.keyCode || e.which;
             if (code === 8) {   // Backspace
-                /\n(.+?)<span/.test(pNode.innerHTML);   // Get last echoed line.
+                /\n(.+?)<span/.test(outputNode.innerHTML);   // Get last line.
                 if (RegExp.$1.length > 'Username: '.length) {
                     // Remove last char.
-                    pNode.innerHTML = pNode.innerHTML.replace(/\n(.+?)<span/, '\n' + RegExp.$1.substring(0, RegExp.$1.length - 1) + '<span');
+                    outputNode.innerHTML = outputNode.innerHTML.replace(
+                        /\n(.+?)<span/,
+                        '\n' + RegExp.$1.substring(0, RegExp.$1.length - 1) +
+                            '<span'
+                    );
                 }
                 swallowEvent(e);   // Prevent browser doing history.back().
             }
@@ -194,7 +199,7 @@ Username: </div>
             case 13:   // Enter
                 print = false;
 
-                prepPrintChar(
+                printString(
                     passwordInput ? '\nUsername: ' : '\nPassword: ',
                     function () {
                         passwordInput = !passwordInput;
@@ -229,18 +234,18 @@ Username: </div>
         };
 
         // TODO: Avoid the user needing to click anywhere first. (Use moved-offscreen input field?)
-        pNode.focus();   // Doesn't work, perhaps need to do this after contents has been rendered?
+        outputNode.focus();   // Doesn't work, perhaps need to do this after contents has been rendered?
     }
 
     scriptNode.parentNode.removeChild(scriptNode);
-    textNode.parentNode.removeChild(textNode);
+    welcomeMsgNode.parentNode.removeChild(welcomeMsgNode);
 
     timerId = setInterval(blink, 500);
 
-    prepPrintChar('Connecting...', acceptCtrlC);
+    printString('Connecting...', acceptCtrlC);
 
     setTimeout(function () {
-        prepPrintChar(textNode.innerHTML, acceptInput);
+        printString(welcomeMsgNode.innerHTML, acceptInput);
     }, 4000);
 }());
         </script>
