@@ -66,7 +66,7 @@ Connected to github.map.fastly.net (199.27.79.133)
 
 Username: </div>
         <script>
-/*global clearInterval, document, setInterval, setTimeout, window */
+/*global clearInterval, clearTimeout, document, setInterval, setTimeout, window */
 (function () {
     'use strict';
 
@@ -74,7 +74,8 @@ Username: </div>
         welcomeMsgNode = document.getElementsByTagName('div')[0],
         blinkNode = document.getElementsByTagName('span')[0],
         scriptNode = document.getElementsByTagName('script')[0],
-        timerId,
+        blinkTimerId,
+        welcomeMsgTimerId,
         index,
         callbackFn,
         text;
@@ -98,12 +99,12 @@ Username: </div>
     }
 
     function printChar() {
-        clearInterval(timerId);
+        clearInterval(blinkTimerId);   // Keep cursor visible.
         blinkNode = document.getElementsByTagName('span')[0];
         blinkNode.style.visibility = 'visible';
 
         if (index === text.length) {
-            timerId = setInterval(blink, 500);
+            blinkTimerId = setInterval(blink, 500);   // String shown; blink on.
 
             callbackFn();
 
@@ -137,14 +138,16 @@ Username: </div>
         printString(
             '\nConnection terminated.',
             function () {
-                // Stop blinking.
-                clearInterval(timerId);
+                clearInterval(blinkTimerId);   // Stop blinking.
             }
         );
 
         // Stop listening for events.
         document.onkeydown = undefined;
         document.onkeypress = undefined;
+
+        // Don't show welcome message, if still pending.
+        clearTimeout(welcomeMsgTimerId);
     }
 
     function acceptCtrlC() {
@@ -237,11 +240,11 @@ Username: </div>
     scriptNode.parentNode.removeChild(scriptNode);
     welcomeMsgNode.parentNode.removeChild(welcomeMsgNode);
 
-    timerId = setInterval(blink, 500);
+    blinkTimerId = setInterval(blink, 500);
 
     printString('Connecting...', acceptCtrlC);
 
-    setTimeout(function () {
+    welcomeMsgTimerId = setTimeout(function () {
         printString(welcomeMsgNode.innerHTML, acceptInput);
     }, 4000);
 }());
