@@ -75,7 +75,7 @@ Username: </div>
         spanNode = document.getElementsByTagName('span')[0],
         scriptNode = document.getElementsByTagName('script')[0],
         timerId,
-        index = 0,
+        index,
         callbackFn,
         text;
 
@@ -96,7 +96,6 @@ Username: </div>
         }
     }
 
-
     function printChar() {
         clearInterval(timerId);
         spanNode = document.getElementsByTagName('span')[0];
@@ -116,6 +115,13 @@ Username: </div>
         setTimeout(printChar, 0);
     }
 
+    function prepPrintChar(txt, cbFn) {
+        text = txt;
+        index = 0;
+        callbackFn = cbFn;
+        printChar();
+    }
+
     function swallowEvent(e) {
         e.cancelBubble = true;
         if (e.stopPropagation) {
@@ -124,6 +130,38 @@ Username: </div>
         if (e.preventDefault) {
             e.preventDefault();
         }
+    }
+
+    function processCtrlC() {
+        prepPrintChar(
+            '\nConnection terminated.',
+            function () {
+                // Stop blinking.
+                clearInterval(timerId);
+            }
+        );
+
+        // Stop listening for events.
+        document.onkeydown = undefined;
+        document.onkeypress = undefined;
+    }
+
+    function acceptCtrlC() {
+        document.onkeypress = function (e) {
+            var code;
+
+            e = e || window.event;
+
+            code = e.keyCode || e.which;
+            switch (code) {
+            case 67:   // 'C'
+            case 99:   // 'c'
+                if (e.ctrlKey) {
+                    processCtrlC();
+                }
+                break;
+            }
+        };
     }
 
     function acceptInput() {
@@ -156,36 +194,20 @@ Username: </div>
             case 13:   // Enter
                 print = false;
 
-                if (passwordInput) {
-                    text = '\nUsername: ';
-                } else {
-                    text = '\nPassword: ';
-                }
-                index = 0;
-
-                callbackFn = function () {
-                    passwordInput = !passwordInput;
-                };
-                printChar();
+                prepPrintChar(
+                    passwordInput ? '\nUsername: ' : '\nPassword: ',
+                    function () {
+                        passwordInput = !passwordInput;
+                    }
+                );
 
                 break;
             case 67:   // 'C'
             case 99:   // 'c'
                 if (e.ctrlKey) {
-                    // TODO: allow Ctrl-C during connecting phase.
                     print = false;
 
-                    text = '\nConnection terminated.';
-                    index = 0;
-                    callbackFn = function () {
-                        // Stop blinking.
-                        clearInterval(timerId);
-                    };
-                    printChar();
-
-                    // Stop listening for events.
-                    document.onkeydown = undefined;
-                    document.onkeypress = undefined;
+                    processCtrlC();
                 }
                 break;
             case 82:   // 'R'
@@ -194,6 +216,7 @@ Username: </div>
                     print = false;
                     swallow = false;
                 }
+                break;
             }
 
             if (print) {
@@ -205,24 +228,20 @@ Username: </div>
             }
         };
 
-        // TODO: Avoid the user needing to click anywhere first.
+        // TODO: Avoid the user needing to click anywhere first. (Use moved-offscreen input field?)
         pNode.focus();   // Doesn't work, perhaps need to do this after contents has been rendered?
     }
 
     scriptNode.parentNode.removeChild(scriptNode);
     textNode.parentNode.removeChild(textNode);
 
-    text = 'Connecting...';
-    index = 0;
-    callbackFn = function () {
-        callbackFn = acceptInput;
-        text = textNode.innerHTML;
-        index = 0;
-        // Now wait for the 4000 ms delayed timer to go off.
-    };
     timerId = setInterval(blink, 500);
-    printChar();
-    setTimeout(printChar, 4000);
+
+    prepPrintChar('Connecting...', acceptCtrlC);
+
+    setTimeout(function () {
+        prepPrintChar(textNode.innerHTML, acceptInput);
+    }, 4000);
 }());
         </script>
     </body>
