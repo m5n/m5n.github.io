@@ -42,7 +42,7 @@ span {
         </style>
     </head>
     <body>
-        <p>Connecting...<span></span></p>
+        <p><span></span></p>
         <div>
 Connected to github.map.fastly.net (199.27.79.133)
 
@@ -77,7 +77,7 @@ Username: </div>
         timerId,
         index = 0,
         callbackFn,
-        text = textNode.innerHTML;
+        text;
 
     function blink() {
         // Span gets rewritten every time, so cannot cache it.
@@ -134,25 +134,28 @@ Username: </div>
             e = e || window.event;
             var code = e.keyCode || e.which;
             if (code === 8) {   // Backspace
-                // Get last printed line.
-                /\n(.+?)<span/.test(pNode.innerHTML);
-                if (RegExp.$1.length > "Username: ".length) {
+                /\n(.+?)<span/.test(pNode.innerHTML);   // Get last echoed line.
+                if (RegExp.$1.length > 'Username: '.length) {
                     // Remove last char.
                     pNode.innerHTML = pNode.innerHTML.replace(/\n(.+?)<span/, '\n' + RegExp.$1.substring(0, RegExp.$1.length - 1) + '<span');
                 }
-                // Swallow to prevent browser doing history.back().
-                swallowEvent(e);
+                swallowEvent(e);   // Prevent browser doing history.back().
             }
         };
         document.onkeypress = function (e) {
+            var code,
+                print = true,
+                swallow = true;
+
             e = e || window.event;
 
-            // Prevent browser default behavior.
-            swallowEvent(e);
+            // TODO: ignore any control character (PgUp, etc.)
 
-            var code = e.keyCode || e.which;
+            code = e.keyCode || e.which;
             switch (code) {
             case 13:   // Enter
+                print = false;
+
                 if (passwordInput) {
                     text = '\nUsername: ';
                 } else {
@@ -166,8 +169,39 @@ Username: </div>
                 printChar();
 
                 break;
-            default:
+            case 67:   // 'C'
+            case 99:   // 'c'
+                if (e.ctrlKey) {
+                    // TODO: allow Ctrl-C during connecting phase.
+                    print = false;
+
+                    text = '\nConnection terminated.';
+                    index = 0;
+                    callbackFn = function () {
+                        // Stop blinking.
+                        clearInterval(timerId);
+                    };
+                    printChar();
+
+                    // Stop listening for events.
+                    document.onkeydown = undefined;
+                    document.onkeypress = undefined;
+                }
+                break;
+            case 82:   // 'R'
+            case 114:   // 'r'
+                if (e.ctrlKey) {
+                    print = false;
+                    swallow = false;
+                }
+            }
+
+            if (print) {
                 echo(passwordInput ? '*' : String.fromCharCode(code));
+            }
+
+            if (swallow) {
+                swallowEvent(e);   // Prevent browser default behavior.
             }
         };
 
@@ -178,10 +212,17 @@ Username: </div>
     scriptNode.parentNode.removeChild(scriptNode);
     textNode.parentNode.removeChild(textNode);
 
-    callbackFn = acceptInput;
+    text = 'Connecting...';
+    index = 0;
+    callbackFn = function () {
+        callbackFn = acceptInput;
+        text = textNode.innerHTML;
+        index = 0;
+        // Now wait for the 4000 ms delayed timer to go off.
+    };
     timerId = setInterval(blink, 500);
+    printChar();
     setTimeout(printChar, 4000);
-    // TODO: "Connecting..." msg should also be delayed-printed.
 }());
         </script>
     </body>
