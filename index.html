@@ -232,9 +232,6 @@ Username: </div>
                 swallowEvent(e);   // Prevent browser default behavior.
             }
         };
-
-        // TODO: Avoid the user needing to click anywhere first. (Use moved-offscreen input field?)
-        outputNode.focus();   // Doesn't work, perhaps need to do this after contents has been rendered?
     }
 
     scriptNode.parentNode.removeChild(scriptNode);
