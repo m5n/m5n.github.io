@@ -32,12 +32,14 @@ pre {
 }
 
 input {
-    XXbackground-color: inherit;
-    XXborder: none;
-    XXcolor: black;
+    background-color: inherit;
+    border: none;
+    color: inherit;
+    font: inherit;
+    font-family: Fixed, monospace;
 
     position: relative;
-    top: 2em;
+    top: -2em;
     left: 0;
 }
 
@@ -200,6 +202,12 @@ Username: </div>
     function acceptInput() {
         var passwordInput = false;
 
+        // Virtual keyboards only comes up as the result of a user action.
+        // So, cannot just execute inputNode.focus().
+        document.onclick = function (e) {
+          inputNode.focus();
+        };
+
         document.onkeydown = function (e) {
             e = e || window.event;
             var code = e.keyCode || e.which;
@@ -263,8 +271,6 @@ Username: </div>
                 swallowEvent(e);   // Prevent browser default behavior.
             }
         };
-
-        inputNode.focus();
     }
 
     scriptNode.parentNode.removeChild(scriptNode);
