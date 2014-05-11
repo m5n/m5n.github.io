@@ -204,6 +204,7 @@ Username: </div>
         // Virtual keyboards only comes up as the result of a user action.
         // So, cannot just execute inputNode.focus().
         document.onclick = function (e) {
+          swallowEvent(e);   // Prevent browser default behavior.
           inputNode.focus();
         };
 
