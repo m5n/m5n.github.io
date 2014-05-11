@@ -2,6 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
         <title>m5n.github.io</title>
         <style>
 html,
@@ -16,19 +17,24 @@ body {
     background: black;
     color: #aaa;
     display: table;
-    font-family: Fixed, monospace;
-    line-height: 1.25
+    font-size: 12pt;
+    line-height: 1.25;
 }
 
 div {
     display: none;
 }
 
-p {
+pre {
     display: table-cell;
     padding: 0.25em;
     vertical-align: bottom;
-    white-space: pre;
+}
+
+input {
+    position: absolute;
+    top: -2em;
+    left: 0;
 }
 
 span {
@@ -42,7 +48,12 @@ span {
         </style>
     </head>
     <body>
-        <p><span></span></p>
+        <!-- See https://github.com/m5n/m5n.github.io for how this works. -->
+        <pre><span></span></pre>
+        <form>
+          <input>
+          <input type="password">
+        </form>
         <div>
 Connected to github.map.fastly.net (199.27.79.133)
 
@@ -66,16 +77,24 @@ Connected to github.map.fastly.net (199.27.79.133)
 
 Username: </div>
         <script>
-/*global clearInterval, clearTimeout, document, setInterval, setTimeout, window */
+/*global
+    clearInterval,
+    clearTimeout,
+    document,
+    setInterval,
+    setTimeout,
+    window
+ */
 (function () {
     'use strict';
 
-    var outputNode = document.getElementsByTagName('p')[0],
+    var outputNode = document.getElementsByTagName('pre')[0],
         welcomeMsgNode = document.getElementsByTagName('div')[0],
+        inputNode = document.getElementsByTagName('input')[1],
         blinkNode = document.getElementsByTagName('span')[0],
         scriptNode = document.getElementsByTagName('script')[0],
         blinkTimerId,
-        welcomeMsgTimerId,
+        welcomeMsgDelayTimerId,
         index,
         callbackFn,
         text;
@@ -88,8 +107,12 @@ Username: </div>
     }
 
     function echo(char) {
-        var i = outputNode.innerHTML.indexOf('<span'), // Could have style attr.
-            prefix = outputNode.innerHTML.substring(0, i);
+        var i,
+            prefix;
+
+        // Don't include '>' for span below as it could have a style attribute.
+        i = outputNode.innerHTML.indexOf('<span');
+        prefix = outputNode.innerHTML.substring(0, i);
 
         outputNode.innerHTML = prefix + char + '<span></span>';
 
@@ -104,7 +127,8 @@ Username: </div>
         blinkNode.style.visibility = 'visible';
 
         if (index === text.length) {
-            blinkTimerId = setInterval(blink, 500);   // String shown; blink on.
+            // Entire string is now shown so start blinking cursor.
+            blinkTimerId = setInterval(blink, 500);
 
             callbackFn();
 
@@ -138,7 +162,7 @@ Username: </div>
         printString(
             '\nConnection terminated.',
             function () {
-                clearInterval(blinkTimerId);   // Stop blinking.
+                clearInterval(blinkTimerId);   // Stop blinking cursor.
             }
         );
 
@@ -147,7 +171,7 @@ Username: </div>
         document.onkeypress = undefined;
 
         // Don't show welcome message, if still pending.
-        clearTimeout(welcomeMsgTimerId);
+        clearTimeout(welcomeMsgDelayTimerId);
     }
 
     function acceptCtrlC() {
@@ -235,6 +259,8 @@ Username: </div>
                 swallowEvent(e);   // Prevent browser default behavior.
             }
         };
+
+        inputNode.focus();
     }
 
     scriptNode.parentNode.removeChild(scriptNode);
@@ -244,7 +270,7 @@ Username: </div>
 
     printString('Connecting...', acceptCtrlC);
 
-    welcomeMsgTimerId = setTimeout(function () {
+    welcomeMsgDelayTimerId = setTimeout(function () {
         printString(welcomeMsgNode.innerHTML, acceptInput);
     }, 4000);
 }());
