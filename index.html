@@ -168,10 +168,15 @@ Username: </div>
             '\nConnection terminated.',
             function () {
                 clearInterval(blinkTimerId);   // Stop blinking cursor.
+
+                sessionStorage['token'] = true;   // Allow user to go through.
+
+                document.location.href = 'home.html';
             }
         );
 
         // Stop listening for events.
+        document.onclick = undefined;
         document.onkeydown = undefined;
         document.onkeypress = undefined;
 
@@ -201,10 +206,11 @@ Username: </div>
     function acceptInput() {
         var passwordInput = false;
 
-        // Virtual keyboards only comes up as the result of a user action.
-        // So, cannot just execute inputNode.focus().
-        document.onclick = function (e) {
-          swallowEvent(e);   // Prevent browser default behavior.
+        // The virtual keyboard of a mobile device does not come up if
+        // inputNode.focus() is called outside of an event handler.
+        // Since the user must click on an input field to enter text anyway,
+        // use a generic click handler to bring up the keyboard.
+        document.onclick = function () {
           inputNode.focus();
         };
 
