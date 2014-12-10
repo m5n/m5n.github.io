@@ -17,7 +17,7 @@
 (function () {
     'use strict';
 
-    if (!sessionStorage['token']) {
+    if (sessionStorage.getItem('token') !== true) {
         document.location.href = '/';
     }
 }());
