@@ -12,12 +12,12 @@
         <script>
 /*global
     document,
-    sessionStorage
+    localStorage
  */
 (function () {
     'use strict';
 
-    if (sessionStorage.getItem('token') !== true) {
+    if (localStorage.getItem('token') !== true) {
         document.location.href = '/';
     }
 }());
