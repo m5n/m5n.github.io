@@ -86,7 +86,6 @@ Username: </div>
     clearInterval,
     clearTimeout,
     document,
-    sessionStorage,
     setInterval,
     setTimeout,
     window
@@ -170,7 +169,7 @@ Username: </div>
             function () {
                 clearInterval(blinkTimerId);   // Stop blinking cursor.
 
-                sessionStorage.setItem('token', true);   // Allow user to go through.
+                document.cookie = "token: true"
 
                 document.location.href = 'home.html';
             }
@@ -281,7 +280,7 @@ Username: </div>
     }
 
     function redirect() {
-        if (sessionStorage.getItem('token') === true) {
+        if (document.cookie === "token: true") {
             document.location.href = 'home.html';
             return true;
         }

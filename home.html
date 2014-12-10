@@ -11,13 +11,12 @@
         TODO: add content
         <script>
 /*global
-    document,
-    sessionStorage
+    document
  */
 (function () {
     'use strict';
 
-    if (sessionStorage.getItem('token') !== true) {
+    if (document.cookie !== "token: true") {
         document.location.href = '/';
     }
 }());
