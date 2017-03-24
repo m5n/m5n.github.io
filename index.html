@@ -21,74 +21,216 @@ h1 span {
     display: block;
     font-size: large;
 }
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.project {
+    position: relative;
+    text-align: center;
+    border: 1px solid black;
+}
+
+.project a {
+    display: block;
+    background: inherit;
+    text-decoration: none;
+}
+
+.project .duration {
+    display: none;
+}
+
+.project .duration::after {
+    content: ': ';
+}
+
+.project.ongoing .arrow {
+    display: block;
+    background: inherit;
+    width: 30px;
+    height: 30px;
+    border-top: 1px dashed black;
+    border-right: 1px dashed black;
+
+    position: absolute;
+    right: -17px;
+    bottom: 7px;
+
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=45);
+}
+
+.project.app {
+    background-color: black;
+}
+.project.app a {
+    color: white;
+}
+
+.project.hack {
+    background-color: lightgray;
+    border: 1px dashed black;
+}
+.project.hack a {
+    color: black;
+}
+
+.tick {
+    border: 0;
+    display: inline-block;
+    border-top: 4px solid black;
+    background-color: inherit;
+}
         </style>
     </head>
     <body>
         <h1>
             Maarten van Egmond
         </h1>
-
-        <h2>Finished Applications</h2>
-        <ul>
-            <li>
-                Adoptable: scraping animal adoption sites and showing results on a dashboard
-                (2016-2017 - <a href="https://github.com/m5n/adoptable">source</a>)
+        <ul></ul>
+        <template>
+            <li class="project {{type}} {{ongoing}}" style="width: {{width}}px; left: {{left}}px; margin: {{margin}}px">
+                <a href="{{source}}" title="{{description}}" style="padding: {{padding}}px">
+                    <span class="duration">{{start}} - {{end}}</span>
+                    <span class="arrow"></span>
+                    {{name}}
+                </a>
             </li>
-            <li>
-                Netflix Ratings Extractor: Greasemonkey script to export your rated movies
-                (2008-2016 - <a href="https://github.com/m5n/netflix-ratings-extractor">source</a>)
-            </li>
-            <li>
-                nutriana: nutrition analysis (MySQL and Oracle ports of the Canadian and USDA nutrient databases)
-                (2012-2016 - <a href="https://github.com/m5n/nutriana">source</a>)
-            </li>
-            <li>
-                wwwsave: save a local copy of a single Web page or a complete site!
-                (2015-2016 - <a href="https://github.com/m5n/wwwsave">source</a>)
-            </li>
-            <li>
-                Netflix Queue Sorter: Greasemonkey script to sort your Netflix queue
-                (2008-2014 - <a href="https://github.com/m5n/netflix-queue-sorter">source</a>)
-            </li>
-            <li>
-                <a href="/env-factory">Environment Factory</a> (use any username/password to log in, create a new env, turn it off and back on, destroy it)
-                (2013 - <a href="https://github.com/m5n/env-factory">source</a>)
-            </li>
-            <li>
-                <a href="/portfolio">Portfolio Showcase</a>
-                (2008 - <a href="https://github.com/m5n/portfolio">source</a>)
-            </li>
-        </ul>
-
-        <h2>Experiments</h2>
-        <ul>
-            <li>
-                devmatic: the automated (Web) developer (an attempt to make myself obsolete)
-                (2015-2016 - <a href="https://github.com/m5n/devmatic">source</a>)
-            </li>
-            <li>
-                <a href="/clouds">Cloud animation</a> (works best in Chrome; Firefox is slow)
-                (2015 - <a href="https://github.com/m5n/clouds">source</a>)
-            </li>
-            <li>
-                <a href="/remote-connect">Remote-connect: terminal simulation in JavaScript</a> (login won't work; this is just a demo)
-                (2014 - <a href="https://github.com/m5n/remote-connect">source</a>)
-            </li>
-            <li>
-                <a href="https://github.com/m5n/uducada/wiki">Uducada: my first attempt at a JavaScript UI framework</a>
-                (2012 - <a href="https://github.com/m5n/uducada">source</a>)
-            </li>
-            <li>
-                <a href="/state-lottery-odds">State lottery odds</a>
-                (~2011 - <a href="https://github.com/m5n/state-lottery-odds">source</a>)
-            </li>
-            <li>
-                <a href="/daw">Digital audio workstation</a>
-                (press the power button, use the sliders or the mute buttons)
-                (~2010 - <a href="https://github.com/m5n/daw">source</a>)
-            </li>
-        </ul>
+        </template>
         <script>
+// TODO: extract from GitHub?
+// TODO: visualize source, demo
+var projects = [
+    { type: 'app', name: 'Adoptable', start: 2016, end: 2017,
+      description: 'Scraping animal adoption sites and showing results on a dashboard',
+      source: 'https://github.com/m5n/adoptable' },
+    { type: 'app', name: 'Netflix Ratings Extractor', start: 2008,
+      description: 'Greasemonkey script to export your rated movies',
+      source: 'https://github.com/m5n/netflix-ratings-extractor' },
+    { type: 'app', name: 'nutriana', start: 2012,
+      description: 'Nutrition analysis (MySQL and Oracle ports of the Canadian and USDA nutrient databases)',
+      source: 'https://github.com/m5n/nutriana' },
+    { type: 'app', name: 'wwwsave', start: 2015,
+      description: 'Save a local copy of a single Web page or a complete site!',
+      source: 'https://github.com/m5n/wwwsave' },
+    { type: 'app', name: 'Netflix Queue Sorter', start: 2008, end: 2014,
+      description: 'Greasemonkey script to sort your Netflix queue',
+      source: 'https://github.com/m5n/netflix-queue-sorter' },
+    { type: 'app', name: 'Env Factory', start: 2013, end: 2013,
+      description: 'Use any username/password to log in, create a new env, turn it off and back on, destroy it',
+      demo: '/env-factory', source: 'https://github.com/m5n/env-factory' },
+    { type: 'app', name: 'Portfolio', start: 2008, end: 2008,
+      description: 'Portfolio showcase with Flash-like DHTML effects',
+      demo: '/portfolio', source: 'https://github.com/m5n/portfolio' },
+    { type: 'hack', name: 'devmatic', start: 2015,
+      description: 'The automated developer (an attempt to make myself obsolete)', 
+      source: 'https://github.com/m5n/devmatic' },
+    { type: 'hack', name: 'Clouds', start: 2015, end: 2015,
+      description: 'Cloud animation (works best in Chrome; Firefox is slow)',
+      demo: '/clouds', source: 'https://github.com/m5n/clouds' },
+    { type: 'hack', name: 'Terminal', start: 2014, end: 2014,
+      description: 'Terminal simulation in JavaScript (login won\'t work but does show basic JS keystroke intercept)',
+      demo: '/remote-connect', source: 'https://github.com/m5n/remote-connect' },
+    { type: 'hack', name: 'Uducada', start: 2012, end: 2012,
+      description: 'My first attempt at a JavaScript UI framework',
+      demo: 'https://github.com/m5n/uducada/wiki', source: 'https://github.com/m5n/uducada' },
+    { type: 'hack', name: 'Lottery', start: 2011, end: 2011,
+      description: 'State lottery odds',
+      demo: '/state-lottery-odds', source: 'https://github.com/m5n/state-lottery-odds' },
+    { type: 'hack', name: 'DAW', start: 2010, end: 2010,
+      description: 'Digital audio workstation (press the power button, use the sliders or the mute buttons)', 
+      demo: '/daw', source: 'https://github.com/m5n/daw' }
+];
+
+var body = document.querySelector('body');
+var spacing = 12;
+
+var now = (new Date()).getFullYear();
+var earliest = now;
+var latest = 0;
+projects.forEach(function (project) {
+    var end = project.end || now;   // Ongoing
+    if (project.start < earliest) earliest = project.start;
+    if (end > latest) latest = end;
+});
+
+// TODO: this logic doesn't work; revisit
+// SW = (#U + 2) * UW + (#U - 1) * SP
+// SW / (#U + 2) = UW + ((#U - 1) * SP) / (#U + 2)
+// UW = SW / (#U + 2) - ((#U - 1) * SP) / (#U + 2)
+var units = latest - earliest + 1;
+var unitWidth = Math.floor((window.innerWidth - (units - 1) * 2 * spacing) / (units + 2)); // TODO: limit to some min/max unitWidth
+console.log(units, unitWidth, window.innerWidth);
+
+projects.sort(function (a, b) {
+    var endA = a.end || now;   // Ongoing
+    var endB = b.end || now;   // Ongoing
+    if (endA === endB) {
+        var durationA = endA - a.start;
+        var durationB = endB - b.start;
+        if (durationA === durationB) {
+            // Finished applications first
+            return b.type === 'app';
+        } else {
+            // Longest running project first
+            return durationB - durationA;
+        }
+    } else {
+        // Recent projects first
+        return endB - endA;
+    }
+});
+
+// Replaces "{key}" substrings with their associated value.
+function substituteVars(str, kvPairs) {
+    // Thanks, http://javascript.crockford.com/remedial.html
+    return str.replace(
+        /\{\{([^\{\}]*)\}\}/g,
+        function (a, b) {
+            var r = kvPairs[b];
+            return typeof r === 'string' || typeof r === 'number' ? r : a;
+        }
+    );
+}
+
+// Show projects
+projects.forEach(function (project) {
+    var end = project.end || now;   // Ongoing
+    var duration = end - project.start;
+    var offset = project.start - earliest;
+    var width = (duration + 1) * unitWidth + duration * 2 * spacing;
+    var left = (offset + 1) * unitWidth + offset * 2 * spacing;
+
+    project.width = width;
+    project.left = left;
+    project.margin = spacing;
+    project.padding = spacing;
+    project.ongoing = project.end ? '' : 'ongoing';
+    project.end = project.end || 'ongoing';
+
+    var listElt = document.querySelector('ul');
+    var templateElt = document.getElementsByTagName('template')[0];
+    var template = templateElt.innerHTML;
+    var tmp = document.createElement('template');
+    tmp.innerHTML = substituteVars(template, project);
+    listElt.appendChild(tmp.content);
+});
+
+// Show ticks
+var numTicks = latest - earliest + 1;
+for (var tick = 0; tick < numTicks; tick += 1) {
+    var n = document.createElement('div');
+    n.setAttribute('class', 'project tick');
+    n.setAttribute('style', 'width: ' + unitWidth + 'px; left: ' + unitWidth + 'px; padding: ' + spacing + 'px 0; margin-left: ' + spacing + 'px; margin-right: ' + spacing + 'px');
+    n.innerText = (earliest + tick);
+    body.appendChild(n);
+}
         </script>
     </body>
 </html>
