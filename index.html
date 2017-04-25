@@ -81,6 +81,30 @@ ul {
     color: black;
 }
 
+.project a.demo {
+    display: block;
+    position: absolute;
+    top: -5px;
+    right: -22px;
+    border-radius: 2px;
+    background-color: white;
+    padding: 0em .75em;
+    color: black;
+    opacity: 0.85;
+    font-weight: bold;
+    border: 3px solid #333;
+    z-index: 100;   /* Above everything else */
+
+    -webkit-transform: rotate(30deg);
+    -moz-transform: rotate(30deg);
+    -ms-transform: rotate(30deg);
+    -o-transform: rotate(30deg);
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=30);
+}
+.project a.demo.hidden {
+    display: none;
+}
+
 .tick {
     border: 0;
     display: inline-block;
@@ -96,6 +120,7 @@ ul {
         <ul></ul>
         <template>
             <li class="project {{type}} {{ongoing}}" style="width: {{width}}px; left: {{left}}px; margin: {{margin}}px">
+                <a href="{{demo}}" class="{{demoClass}}">Demo</a>
                 <a href="{{source}}" title="{{description}}" style="padding: {{padding}}px">
                     <span class="duration">{{start}} - {{end}}</span>
                     <span class="arrow"></span>
@@ -111,19 +136,19 @@ var projects = [
       description: 'Scraping animal adoption sites and showing results on a dashboard',
       source: 'https://github.com/m5n/adoptable' },
     { type: 'app', name: 'Netflix Ratings Extractor', start: 2008,
-      description: 'Greasemonkey script to export your rated movies',
+      description: 'Greasemonkey script to export your Netflix movie ratings',
       source: 'https://github.com/m5n/netflix-ratings-extractor' },
     { type: 'app', name: 'nutriana', start: 2012,
-      description: 'Nutrition analysis (MySQL and Oracle ports of the Canadian and USDA nutrient databases)',
+      description: 'MySQL and Oracle ports of the Canadian and USDA nutrient databases',
       source: 'https://github.com/m5n/nutriana' },
     { type: 'app', name: 'wwwsave', start: 2015,
       description: 'Save a local copy of a single Web page or a complete site!',
       source: 'https://github.com/m5n/wwwsave' },
     { type: 'app', name: 'Netflix Queue Sorter', start: 2008, end: 2014,
-      description: 'Greasemonkey script to sort your Netflix queue',
+      description: 'Greasemonkey script to sort your Netflix queue (no longer works)',
       source: 'https://github.com/m5n/netflix-queue-sorter' },
     { type: 'app', name: 'Env Factory', start: 2013, end: 2013,
-      description: 'Use any username/password to log in, create a new env, turn it off and back on, destroy it',
+      description: 'Nice looking UI with cool effects to manage deployment environments consisting of VMs / services (use any username/password to log in, create a new env, turn it off and back on, destroy it)',
       demo: '/env-factory', source: 'https://github.com/m5n/env-factory' },
     { type: 'app', name: 'Portfolio', start: 2008, end: 2008,
       description: 'Portfolio showcase with Flash-like DHTML effects',
@@ -141,7 +166,7 @@ var projects = [
       description: 'My first attempt at a JavaScript UI framework',
       demo: 'https://github.com/m5n/uducada/wiki', source: 'https://github.com/m5n/uducada' },
     { type: 'hack', name: 'Lottery', start: 2011, end: 2011,
-      description: 'State lottery odds',
+      description: 'State lottery odds calculator',
       demo: '/state-lottery-odds', source: 'https://github.com/m5n/state-lottery-odds' },
     { type: 'hack', name: 'DAW', start: 2010, end: 2010,
       description: 'Digital audio workstation (press the power button, use the sliders or the mute buttons)', 
@@ -187,7 +212,7 @@ projects.sort(function (a, b) {
     }
 });
 
-// Replaces "{key}" substrings with their associated value.
+// Replaces "{{key}}" substrings with their associated value.
 function substituteVars(str, kvPairs) {
     // Thanks, http://javascript.crockford.com/remedial.html
     return str.replace(
@@ -213,13 +238,13 @@ projects.forEach(function (project) {
     project.padding = spacing;
     project.ongoing = project.end ? '' : 'ongoing';
     project.end = project.end || 'ongoing';
+    project.demoClass = project.demo ? 'demo' : 'demo hidden';
 
     var listElt = document.querySelector('ul');
-    var templateElt = document.getElementsByTagName('template')[0];
-    var template = templateElt.innerHTML;
-    var tmp = document.createElement('template');
-    tmp.innerHTML = substituteVars(template, project);
-    listElt.appendChild(tmp.content);
+    var templateMarkup = document.querySelector('template').innerHTML;
+    var tmpElt = document.createElement('template');
+    tmpElt.innerHTML = substituteVars(templateMarkup, project);
+    listElt.appendChild(tmpElt.content);
 });
 
 // Show ticks
